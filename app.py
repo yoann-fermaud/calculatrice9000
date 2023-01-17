@@ -11,6 +11,8 @@ DEFAULT_BG_COLOR_BUTTON = "#252525"
 SPECIAL_BG_COLOR = "#FF9500"
 
 expression = ""
+history = ""
+index_history = 0
 
 
 def press_button(key):
@@ -19,6 +21,13 @@ def press_button(key):
         return
     elif key == "C":
         clear_expression()
+        return
+    elif key == "history":
+        history_expression()
+        return
+    elif key == "":
+        clear_expression()
+        clear_history_expression()
         return
 
     global expression
@@ -29,12 +38,35 @@ def press_button(key):
 def calculate_expression():
     try:
         global expression
+        global history
+        global index_history
         total = str(eval(expression))
         equation.set(total[:4])
         expression = total[:4]
+        index_history += 1
+        history += expression + "; "
     except:
         equation.set("Error")
         expression = ""
+
+
+def history_expression():
+    global history
+    global index_history
+    equation.set(history)
+    if index_history == 2:
+        history = ""
+        index_history = 0
+    else:
+        pass
+
+
+def clear_history_expression():
+    global history
+    global index_history
+    history = ""
+    equation.set("")
+    index_history = 0
 
 
 def clear_expression():
@@ -46,7 +78,7 @@ def clear_expression():
 if __name__ == '__main__':
     window = Tk()
     window.configure(bg=DEFAULT_BG_COLOR)
-    window.geometry("365x665")
+    window.geometry("375x760")
     window.resizable(False, False)
     window.title("Calculator")
 
@@ -56,7 +88,12 @@ if __name__ == '__main__':
                    font=DIGITS_RESULT_FONT_STYLE, height=3)
     result.grid(row=0, columnspan=4)
 
-    buttons = ["C", "\u221a", "x²", "/", 7, 8, 9, "x", 4, 5, 6, "-", 1, 2, 3, "+", 0, "\t", ",", "="]
+    delete = Label(window, text="del", bg=DEFAULT_BG_COLOR_BUTTON, fg=DIGITS_FONT_COLOR,
+                   font=DIGITS_FONT_STYLE, height=2, width=17)
+    delete.grid(row=6, columnspan=4)
+    delete.bind("<Button-1>", lambda event: press_button(""))
+
+    buttons = ["C", "\u221a", "x²", "/", 7, 8, 9, "x", 4, 5, 6, "-", 1, 2, 3, "+", 0, "h", ",", "="]
 
     grid_row = 1
     grid_column = 0
@@ -82,10 +119,11 @@ if __name__ == '__main__':
                            font=DIGITS_FONT_STYLE, height=2, width=4)
             button.grid(row=grid_row, column=grid_column, sticky=NSEW)
             button.bind("<Button-1>", lambda event: press_button("*"))
-        elif element == "\t":
+        elif element == "h":
             button = Label(window, text=str(element), bg=DEFAULT_BG_COLOR_BUTTON, fg=DIGITS_FONT_COLOR,
                            font=DIGITS_FONT_STYLE, height=2, width=4)
             button.grid(row=grid_row, column=grid_column, sticky=NSEW)
+            button.bind("<Button-1>", lambda event: press_button("history"))
         elif element == ",":
             button = Label(window, text=str(element), bg=DEFAULT_BG_COLOR_BUTTON, fg=DIGITS_FONT_COLOR,
                            font=DIGITS_FONT_STYLE, height=2, width=4)
